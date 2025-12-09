@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Quản lý sách - Admin</title>
+
+    <!-- CSRF cho AJAX -->
+    <meta name="_csrf" th:content="${_csrf.token}" />
+    <meta name="_csrf_header" th:content="${_csrf.headerName}" />
+
+    <!-- Google Font -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@300;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <!-- FontAwesome -->
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css"
+      rel="stylesheet"
+    />
+
+    <style>
+      /* ===== CSS Variables - Bookstore Theme ===== */
+      :root {
+        --primary-color: #8b6f47;
+        --primary-dark: #6b5535;
+        --primary-light: #d4a574;
+        --accent-color: #d4a574;
+        --text-light: #fff8f0;
+        --text-muted: #9b8b7e;
+        --warm-bg: #faf8f3;
+      }
+
+      /* ===== Tổng thể ===== */
+      body {
+        font-family: "Poppins", sans-serif;
+        background: linear-gradient(
+          135deg,
+          var(--warm-bg) 0%,
+          #ffffff 50%,
+          rgba(218, 165, 32, 0.03) 100%
+        );
+        padding-top: 72px;
+        color: #333;
+      }
+
+      /* ===== Navbar ===== */
+      .navbar {
+        background: linear-gradient(
+          90deg,
+          var(--primary-color),
+          var(--primary-dark)
+        ) !important;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+        border-bottom: 2px solid rgba(218, 165, 32, 0.2);
+      }
+      .navbar-brand {
+        font-weight: 700;
+        font-size: 1.3rem;
+        letter-spacing: 1px;
+        color: #fff !important;
+      }
+      .navbar-brand i {
+        color: #ffc107;
+        margin-right: 8px;
+      }
+      .navbar .btn-outline-light {
+        border-color: rgba(255, 255, 255, 0.6);
+        color: #fff;
+        transition: all 0.3s ease;
+      }
+      .navbar .btn-outline-light:hover {
+        background: rgba(255, 255, 255, 0.15);
+        border-color: rgba(255, 255, 255, 0.3);
+        transform: translateY(-2px);
+      }
+
+      /* ===== Card ===== */
+      .card {
+        border: 1px solid rgba(139, 111, 71, 0.15);
+        border-radius: 1.5rem;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+        background: #fff;
+      }
+      .card-header {
+        background: linear-gradient(
+          135deg,
+          var(--primary-color),
+          var(--primary-dark)
+        );
+        color: #fff;
+        font-weight: 600;
+        border-radius: 1.5rem 1.5rem 0 0;
+        border: none;
+      }
+
+      /* ===== Buttons ===== */
+      .btn-primary {
+        background: linear-gradient(
+          135deg,
+          var(--primary-color),
+          var(--primary-dark)
+        );
+        border: none;
+        color: #fff;
+        font-weight: 600;
+        transition: all 0.3s ease;
+      }
+      .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(139, 111, 71, 0.3);
+      }
+
+      /* ===== Page Header ===== */
+      .page-header {
+        background: linear-gradient(
+          135deg,
+          var(--primary-color),
+          var(--primary-dark)
+        );
+        color: #fff;
+        padding: 3rem 2rem;
+        border-radius: 1.5rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+      }
+      .page-header h1 {
+        font-family: "Playfair Display", serif;
+        font-weight: 700;
+        font-size: 2.5rem;
+        margin-bottom: 0.5rem;
+      }
+      .page-header p {
+        margin: 0;
+        opacity: 0.95;
+      }
+
+      /* ===== Filter Section ===== */
+      .filter-section {
+        background: #fff;
+        border-radius: 1.5rem;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        border: 1px solid rgba(139, 111, 71, 0.15);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      }
+      .filter-section .form-label {
+        font-weight: 600;
+        color: var(--primary-color);
+      }
+      .filter-section .form-control,
+      .filter-section .form-select {
+        border: 2px solid rgba(139, 111, 71, 0.2);
+        border-radius: 0.75rem;
+        padding: 0.75rem 1rem;
+        transition: all 0.3s ease;
+      }
+      .filter-section .form-control:focus,
+      .filter-section .form-select:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 0.2rem rgba(139, 111, 71, 0.1);
+      }
+
+      /* ===== Table ===== */
+      .table-responsive {
+        border-radius: 0 0 1.5rem 1.5rem;
+        overflow: hidden;
+      }
+      .table thead th {
+        background: linear-gradient(
+          135deg,
+          var(--primary-color),
+          var(--primary-dark)
+        );
+        color: #fff;
+        border: none;
+        font-weight: 600;
+      }
+      .table tbody tr {
+        transition: all 0.2s ease;
+      }
+      .table tbody tr:hover {
+        background: rgba(139, 111, 71, 0.08);
+        box-shadow: inset 0 0 10px rgba(139, 111, 71, 0.08);
+      }
+
+      /* ===== Action Buttons ===== */
+      .action-group {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+      }
+
+      /* ===== Empty state ===== */
+      .empty-state {
+        text-align: center;
+        padding: 3rem 2rem;
+        color: var(--text-muted);
+      }
+      .empty-state i {
+        font-size: 3rem;
+        color: var(--primary-light);
+        margin-bottom: 1rem;
+      }
+      .empty-state p {
+        margin: 0;
+        font-size: 1.1rem;
+      }
+
+      /* ===== Stats Cards ===== */
+      .stats-card {
+        background: linear-gradient(135deg, #ffffff, #fffbf5);
+        border-radius: 1.5rem;
+        padding: 1.5rem;
+        border: 1px solid rgba(139, 111, 71, 0.15);
+        text-align: center;
+      }
+      .stats-card h3 {
+        font-size: 2rem;
+        font-weight: 800;
+        color: var(--primary-dark);
+        margin: 0.5rem 0;
+      }
+      .stats-card p {
+        margin: 0;
+        color: var(--text-muted);
+        font-size: 0.9rem;
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- ===== NAVBAR ===== -->
+    <nav class="navbar navbar-expand-lg navbar-dark mb-4 fixed-top">
+      <div class="container-lg">
+        <a
+          class="navbar-brand d-flex align-items-center"
+          th:href="@{/admin/dashboard}"
+        >
+          ADMIN
+        </a>
+
+        <div class="ms-auto d-flex align-items-center gap-2">
+          <a
+            class="btn btn-outline-light"
+            th:href="@{/admin/dashboard}"
+            title="Bảng điều khiển"
+          >
+            <i class="fas fa-tachometer-alt"></i>
+          </a>
+          <a class="btn btn-outline-light" th:href="@{/}" title="Trang chủ">
+            <i class="fas fa-home"></i>
+          </a>
+          <form th:action="@{/logout}" method="post" class="d-inline">
+            <input
+              type="hidden"
+              th:name="${_csrf.parameterName}"
+              th:value="${_csrf.token}"
+            />
+            <button
+              type="submit"
+              class="btn btn-outline-light"
+              title="Đăng xuất"
+            >
+              <i class="fas fa-sign-out-alt"></i>
+            </button>
+          </form>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container-lg mt-4 mb-5">
+      <!-- ===== PAGE HEADER ===== -->
+      <div class="page-header d-flex justify-content-between align-items-start">
+        <div>
+          <h1><i class="fas fa-book me-2"></i>Quản lý sách</h1>
+          <p>Thêm, chỉnh sửa và xóa sách khỏi kho lưu trữ</p>
+        </div>
+        <div class="d-flex gap-2">
+          <a
+            class="btn btn-light fw-semibold px-3 py-2 rounded-pill shadow-sm"
+            style="color: var(--primary-color)"
+            th:href="@{/admin/product/new}"
+          >
+            <i class="fas fa-plus-circle me-1"></i>Thêm sách mới
+          </a>
+          <a
+            class="btn btn-light fw-semibold px-3 py-2 rounded-pill shadow-sm"
+            style="color: var(--primary-color)"
+            th:href="@{/admin/dashboard}"
+          >
+            <i class="fas fa-arrow-left me-1"></i>Quay lại
+          </a>
+        </div>
+      </div>
+
+      <!-- ===== STATS ===== -->
+      <div class="row g-3 mb-4">
+        <div class="col-12 col-md-3">
+          <div class="stats-card">
+            <i
+              class="fas fa-book fa-2x"
+              style="color: var(--primary-color)"
+            ></i>
+            <h3 th:text="${#lists.size(list)}">0</h3>
+            <p>Tổng số sách</p>
+          </div>
+        </div>
+        <div class="col-12 col-md-3">
+          <div class="stats-card">
+            <i class="fas fa-cubes fa-2x" style="color: #10b981"></i>
+            <h3 th:text="${#aggregates.sum(list.![quantity])}">0</h3>
+            <p>Tổng số lượng tồn</p>
+          </div>
+        </div>
+        <div class="col-12 col-md-3">
+          <div class="stats-card">
+            <i class="fas fa-dollar-sign fa-2x" style="color: #f59e0b"></i>
+            <h3
+              th:text="${'₫' + #numbers.formatDecimal(#aggregates.sum(list.![price * quantity]),0,'COMMA',0,'POINT')}"
+            >
+              0₫
+            </h3>
+            <p>Giá trị kho hàng</p>
+          </div>
+        </div>
+        <div class="col-12 col-md-3">
+          <div class="stats-card">
+            <i class="fas fa-box-open fa-2x" style="color: #ef4444"></i>
+            <h3 th:text="${#lists.size(list.?[quantity == 0])}">0</h3>
+            <p>Sách hết hàng</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== PRODUCTS TABLE ===== -->
+      <div class="card mb-4">
+        <div
+          class="card-header d-flex justify-content-between align-items-center"
+        >
+          <h5 class="mb-0">
+            <i class="fas fa-list me-2"></i>Danh sách sách
+            <span
+              class="badge bg-primary ms-2"
+              th:text="'Tổng: ' + ${#lists.size(list)}"
+              >0</span
+            >
+          </h5>
+        </div>
+
+        <div class="table-responsive">
+          <table class="table table-hover mb-0 align-middle">
+            <thead>
+              <tr>
+                <th style="width: 8%">ID</th>
+                <th style="width: 22%">Tên sách</th>
+                <th style="width: 15%">Tác giả</th>
+                <th style="width: 12%" class="text-end">Giá</th>
+                <th style="width: 10%" class="text-center">Số lượng</th>
+                <th style="width: 10%" class="text-center">Trạng thái</th>
+                <th style="width: 23%" class="text-center">Hành động</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                th:each="p : ${list}"
+                class="product-row"
+                th:attr="data-product-id=${p.id}"
+              >
+                <td class="fw-semibold text-primary" th:text="${p.id}"></td>
+                <td th:text="${p.name}"></td>
+                <td th:text="${p.brand}" class="text-muted"></td>
+                <td
+                  class="text-end fw-semibold text-success"
+                  th:text="${#numbers.formatDecimal(p.price,0,'COMMA',2,'POINT')} + '₫'"
+                ></td>
+                <td class="text-center">
+                  <span
+                    th:if="${p.quantity > 0}"
+                    class="badge bg-success"
+                    th:text="${p.quantity}"
+                    >0</span
+                  >
+                  <span th:if="${p.quantity == 0}" class="badge bg-danger"
+                    >Hết hàng</span
+                  >
+                </td>
+                <td class="text-center">
+                  <span th:if="${p.quantity > 5}" class="badge bg-success"
+                    >Có sẵn</span
+                  >
+                  <span
+                    th:if="${p.quantity <= 5 && p.quantity > 0}"
+                    class="badge bg-warning"
+                    >Sắp hết</span
+                  >
+                  <span th:if="${p.quantity == 0}" class="badge bg-danger"
+                    >Hết</span
+                  >
+                </td>
+                <td class="text-center">
+                  <div class="action-group justify-content-center">
+                    <!-- View/Edit -->
+                    <a
+                      class="btn btn-sm btn-outline-primary rounded-pill px-2 py-1"
+                      th:href="@{/admin/product/{id}/edit(id=${p.id})}"
+                    >
+                      <i class="fas fa-edit me-1"></i>Sửa
+                    </a>
+
+                    <!-- Delete -->
+                    <form
+                      th:action="@{/admin/product/{id}/delete(id=${p.id})}"
+                      method="post"
+                      class="d-inline"
+                      onsubmit="return confirm('Xác nhận xóa sách này?');"
+                    >
+                      <input
+                        type="hidden"
+                        th:name="${_csrf.parameterName}"
+                        th:value="${_csrf.token}"
+                      />
+                      <button
+                        type="submit"
+                        class="btn btn-sm btn-outline-danger rounded-pill px-2 py-1"
+                      >
+                        <i class="fas fa-trash-alt me-1"></i>Xóa
+                      </button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Empty State -->
+              <tr th:if="${#lists.isEmpty(list)}">
+                <td colspan="7">
+                  <div class="empty-state">
+                    <i class="fas fa-book"></i>
+                    <p>Không tìm thấy sách nào</p>
+                    <a
+                      th:href="@{/admin/product/new}"
+                      class="btn btn-primary mt-3"
+                    >
+                      <i class="fas fa-plus-circle me-1"></i>Thêm sách mới
+                    </a>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>

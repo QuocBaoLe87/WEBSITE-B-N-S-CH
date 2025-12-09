@@ -1,0 +1,24 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-WebsitebanlaptopApplication<websitebanlaptop>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.ductieng.WebsitebanlaptopApplication",
+            "projectName": "websitebanlaptop",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-WebsitebanlaptopApplication<website>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.v.WebsitebanlaptopApplication",
+            "projectName": "website",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}

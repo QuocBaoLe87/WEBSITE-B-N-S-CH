@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Thanh toán - ZUNO Library</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
+    />
+    <link rel="stylesheet" th:href="@{/css/trangchu.css}" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800&family=Poppins:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --brand-golden: #daa520;
+        --brand-dark: #8b4513;
+        --brand-light: #f5deb3;
+        --text-dark: #2c3e50;
+        --text-muted: #7f8c8d;
+      }
+
+      body {
+        background: linear-gradient(135deg, #fafafa 0%, #f5f5f0 100%);
+        font-family: "Poppins", sans-serif;
+        padding-top: 80px;
+      }
+
+      /* Checkout page background */
+      .checkout-page {
+        background: linear-gradient(
+            135deg,
+            rgba(218, 165, 32, 0.08) 0%,
+            rgba(139, 69, 19, 0.05) 100%
+          ),
+          linear-gradient(135deg, #fafafa 0%, #f5f5f0 100%);
+        min-height: calc(100vh - 80px);
+      }
+
+      /* Navbar separator */
+      .navbar-separator {
+        height: 1px;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(218, 165, 32, 0.3),
+          transparent
+        );
+      }
+
+      /* Steps */
+      .steps-container {
+        background: rgba(255, 255, 255, 0.6);
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid rgba(218, 165, 32, 0.15);
+        padding: 1.5rem 0;
+        margin-bottom: 3rem;
+      }
+
+      .steps {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+
+      .step {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        color: var(--text-muted);
+        font-weight: 600;
+        font-size: 0.95rem;
+      }
+
+      .step .dot {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(218, 165, 32, 0.15);
+        color: var(--text-dark);
+        font-size: 1rem;
+        font-weight: 700;
+        border: 2px solid rgba(218, 165, 32, 0.3);
+      }
+
+      .step.active {
+        color: var(--brand-golden);
+      }
+
+      .step.active .dot {
+        background: linear-gradient(135deg, var(--brand-golden), #b8860b);
+        color: white;
+        border-color: var(--brand-golden);
+        box-shadow: 0 4px 15px rgba(218, 165, 32, 0.3);
+      }
+
+      .step + .step::before {
+        content: "";
+        display: block;
+        width: 40px;
+        height: 2px;
+        background: rgba(218, 165, 32, 0.25);
+        border-radius: 2px;
+        margin-right: 0.5rem;
+      }
+
+      /* Cards */
+      .card-glass {
+        background: rgba(255, 255, 255, 0.95);
+        border: 1.5px solid rgba(218, 165, 32, 0.2);
+        border-radius: 1.25rem;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+        backdrop-filter: blur(10px);
+      }
+
+      .card-glass:hover {
+        border-color: rgba(218, 165, 32, 0.35);
+        box-shadow: 0 12px 40px rgba(218, 165, 32, 0.12);
+      }
+
+      .section-heading {
+        color: var(--text-dark);
+        font-weight: 700;
+        font-size: 1.5rem;
+        font-family: "Playfair Display", serif;
+        letter-spacing: 0.3px;
+      }
+
+      .section-subheading {
+        color: var(--text-muted);
+        font-size: 0.95rem;
+      }
+
+      /* List items */
+      .item-thumb {
+        width: 70px;
+        height: 70px;
+        object-fit: cover;
+        border-radius: 0.75rem;
+        border: 1px solid rgba(218, 165, 32, 0.15);
+      }
+
+      .item-name {
+        font-weight: 600;
+        color: var(--text-dark);
+      }
+
+      .qty {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+      }
+
+      .price {
+        font-weight: 700;
+        color: var(--brand-golden);
+        font-size: 1.05rem;
+        font-family: "Playfair Display", serif;
+      }
+
+      /* Totals */
+      .total-box {
+        background: linear-gradient(
+          135deg,
+          rgba(218, 165, 32, 0.08) 0%,
+          rgba(139, 69, 19, 0.05) 100%
+        );
+        border: 2px dashed rgba(218, 165, 32, 0.3);
+        border-radius: 1rem;
+        padding: 1.5rem;
+      }
+
+      .line {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid rgba(218, 165, 32, 0.1);
+      }
+
+      .line:last-child {
+        border-bottom: none;
+      }
+
+      .line.total {
+        color: var(--brand-golden);
+        font-size: 1.25rem;
+        font-weight: 800;
+        padding-top: 1rem;
+        margin-top: 1rem;
+        border-top: 2px solid rgba(218, 165, 32, 0.2);
+      }
+
+      /* Form styling */
+      .form-control,
+      .form-select {
+        border: 1.5px solid rgba(218, 165, 32, 0.2);
+        border-radius: 0.75rem;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+      }
+
+      .form-control:focus,
+      .form-select:focus {
+        border-color: var(--brand-golden);
+        box-shadow: 0 0 0 0.25rem rgba(218, 165, 32, 0.15);
+        background-color: rgba(218, 165, 32, 0.02);
+      }
+
+      .form-floating > .form-control:focus ~ label,
+      .form-floating > .form-select:focus ~ label {
+        color: var(--brand-golden);
+      }
+
+      /* Buttons */
+      .btn-primary {
+        background: linear-gradient(135deg, var(--brand-golden), #b8860b);
+        border: none;
+        color: white;
+        font-weight: 600;
+        border-radius: 0.75rem;
+        padding: 0.75rem 1.5rem;
+        transition: all 0.3s ease;
+      }
+
+      .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(218, 165, 32, 0.3);
+        background: linear-gradient(135deg, #b8860b, #9a7023);
+        color: white;
+      }
+
+      .btn-success {
+        background: linear-gradient(135deg, var(--brand-golden), #b8860b);
+        border: none;
+        color: white;
+        font-weight: 600;
+        border-radius: 0.75rem;
+        padding: 0.75rem 2rem;
+        width: 100%;
+        transition: all 0.3s ease;
+      }
+
+      .btn-success:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(218, 165, 32, 0.3);
+        background: linear-gradient(135deg, #b8860b, #9a7023);
+        color: white;
+      }
+
+      .btn-outline-secondary {
+        color: var(--brand-dark);
+        border: 2px solid var(--brand-dark);
+        font-weight: 600;
+        border-radius: 0.75rem;
+        transition: all 0.3s ease;
+      }
+
+      .btn-outline-secondary:hover {
+        background: var(--brand-dark);
+        border-color: var(--brand-dark);
+        color: white;
+      }
+
+      .btn-check:checked + label {
+        background: linear-gradient(135deg, var(--brand-golden), #b8860b);
+        color: white;
+        border-color: var(--brand-golden);
+      }
+
+      /* Radio buttons as segmented */
+      .segmented {
+        gap: 0.75rem;
+      }
+
+      .segmented label {
+        border: 2px solid rgba(218, 165, 32, 0.3);
+        border-radius: 0.75rem;
+        padding: 0.75rem 1.25rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        color: var(--text-dark);
+        font-weight: 600;
+        background: rgba(255, 255, 255, 0.8);
+      }
+
+      .segmented label:hover {
+        border-color: var(--brand-golden);
+        background: rgba(218, 165, 32, 0.05);
+      }
+
+      /* Coupon section */
+      .coupon-section {
+        padding-bottom: 1.5rem;
+        border-bottom: 2px dashed rgba(218, 165, 32, 0.2);
+        margin-bottom: 1.5rem;
+      }
+
+      .coupon-label {
+        font-weight: 600;
+        color: var(--text-dark);
+        font-size: 0.95rem;
+      }
+
+      .input-group .btn-primary {
+        padding: 0.75rem 1rem;
+      }
+
+      /* Sticky summary */
+      .sticky-summary {
+        position: sticky;
+        top: 120px;
+      }
+
+      /* Alerts */
+      .alert {
+        border-radius: 0.75rem;
+        border: 1.5px solid;
+      }
+
+      .alert-success {
+        background: rgba(144, 238, 144, 0.1);
+        border-color: #90ee90;
+        color: #155724;
+      }
+
+      .alert-danger {
+        background: rgba(240, 128, 128, 0.1);
+        border-color: #f08080;
+        color: #721c24;
+      }
+
+      /* Back button */
+      .btn-back {
+        color: var(--brand-dark);
+        font-weight: 600;
+        transition: all 0.3s ease;
+      }
+
+      .btn-back:hover {
+        color: var(--brand-golden);
+        transform: translateX(-3px);
+      }
+
+      /* Responsive */
+      @media (max-width: 991.98px) {
+        .sticky-summary {
+          position: static;
+          margin-top: 2rem;
+        }
+
+        .step + .step::before {
+          display: none;
+        }
+
+        .steps {
+          flex-direction: column;
+          gap: 0.5rem;
+        }
+      }
+
+      @media (max-width: 767.98px) {
+        .section-heading {
+          font-size: 1.25rem;
+        }
+
+        .card-glass {
+          padding: 1.5rem !important;
+        }
+
+        .btn-success {
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div th:replace="~{fragments/navbar :: navbar}"></div>
+
+    <!-- Steps indicator -->
+    <div class="steps-container">
+      <div class="container">
+        <div class="steps">
+          <div class="step">
+            <span class="dot">1</span><span>Giỏ hàng</span>
+          </div>
+          <div class="step">
+            <span class="dot">2</span><span>Thông tin</span>
+          </div>
+          <div class="step active">
+            <span class="dot">3</span><span>Thanh toán</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <main class="checkout-page py-4 py-lg-5">
+      <div class="container">
+        <div class="row g-4 g-lg-5">
+          <!-- Left: Form -->
+          <div class="col-lg-7">
+            <div class="card-glass p-4 p-lg-5">
+              <h1 class="section-heading mb-2">
+                <i
+                  class="bi bi-credit-card me-2"
+                  style="color: var(--brand-golden)"
+                ></i
+                >Thông tin thanh toán
+              </h1>
+              <p class="section-subheading mb-4">
+                Nhập thông tin người nhận và chọn phương thức thanh toán để hoàn
+                tất đơn hàng.
+              </p>
+
+              <form
+                th:action="@{/checkout}"
+                th:object="${checkoutForm}"
+                method="post"
+              >
+                <input
+                  type="hidden"
+                  th:if="${_csrf != null}"
+                  th:name="${_csrf.parameterName}"
+                  th:value="${_csrf.token}"
+                />
+
+                <div class="row g-3">
+                  <div class="col-12">
+                    <div class="form-floating">
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="fullName"
+                        placeholder="Họ và tên"
+                        th:field="*{fullName}"
+                        required
+                      />
+                      <label for="fullName">
+                        <i
+                          class="bi bi-person me-2"
+                          style="color: var(--brand-golden)"
+                        ></i
+                        >Họ và tên
+                      </label>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-floating">
+                      <input
+                        type="email"
+                        class="form-control"
+                        id="email"
+                        placeholder="Email"
+                        th:field="*{email}"
+                        required
+                      />
+                      <label for="email">
+                        <i
+                          class="bi bi-envelope me-2"
+                          style="color: var(--brand-golden)"
+                        ></i
+                        >Email
+                      </label>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-floating">
+                      <input
+                        type="tel"
+                        class="form-control"
+                        id="phone"
+                        placeholder="Số điện thoại"
+                        th:field="*{phone}"
+                        required
+                      />
+                      <label for="phone">
+                        <i
+                          class="bi bi-telephone me-2"
+                          style="color: var(--brand-golden)"
+                        ></i
+                        >Số điện thoại
+                      </label>
+                    </div>
+                  </div>
+                  <div class="col-12">
+                    <div class="form-floating">
+                      <textarea
+                        class="form-control"
+                        placeholder="Địa chỉ"
+                        id="address"
+                        style="height: 100px"
+                        th:field="*{address}"
+                        required
+                      ></textarea>
+                      <label for="address">
+                        <i
+                          class="bi bi-geo-alt me-2"
+                          style="color: var(--brand-golden)"
+                        ></i
+                        >Địa chỉ giao hàng
+                      </label>
+                    </div>
+                  </div>
+
+                  <div class="col-12">
+                    <label class="form-label fw-semibold mb-2">
+                      <i
+                        class="bi bi-wallet2 me-2"
+                        style="color: var(--brand-golden)"
+                      ></i
+                      >Phương thức thanh toán
+                      <span class="text-danger">*</span>
+                    </label>
+                    <div class="segmented d-flex flex-wrap">
+                      <input
+                        class="btn-check"
+                        type="radio"
+                        id="pmCOD"
+                        th:field="*{paymentMethod}"
+                        value="COD"
+                        required
+                      />
+                      <label class="btn flex-fill" for="pmCOD"
+                        ><i class="bi bi-truck me-2"></i>Thanh toán khi nhận
+                        hàng (COD)</label
+                      >
+
+                      <input
+                        class="btn-check"
+                        type="radio"
+                        id="pmVNPAY"
+                        th:field="*{paymentMethod}"
+                        value="VNPAY"
+                      />
+                      <label class="btn flex-fill" for="pmVNPAY"
+                        ><i class="bi bi-bank me-2"></i>Chuyển khoản ngân hàng
+                        (VNPAY)</label
+                      >
+                    </div>
+                    <div
+                      class="invalid-feedback d-block"
+                      th:if="${#fields.hasErrors('paymentMethod')}"
+                      th:errors="*{paymentMethod}"
+                    >
+                      Vui lòng chọn phương thức thanh toán.
+                    </div>
+                  </div>
+                </div>
+
+                <div class="d-grid gap-2 mt-5">
+                  <button type="submit" class="btn btn-success">
+                    <i class="bi bi-check-circle me-2"></i>Xác nhận thanh toán
+                  </button>
+                  <a th:href="@{/cart}" class="btn btn-outline-secondary"
+                    ><i class="bi bi-arrow-left me-2"></i>Quay lại giỏ hàng</a
+                  >
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <!-- Right: Order summary -->
+          <div class="col-lg-5">
+            <div class="card-glass p-4 p-lg-5 sticky-summary">
+              <h2 class="section-heading mb-3">
+                <i
+                  class="bi bi-receipt me-2"
+                  style="color: var(--brand-golden)"
+                ></i
+                >Tóm tắt đơn hàng
+              </h2>
+
+              <!-- Alerts -->
+              <div
+                th:if="${success}"
+                class="alert alert-success py-2 px-3 mb-3"
+                th:text="${success}"
+              ></div>
+              <div
+                th:if="${error}"
+                class="alert alert-danger py-2 px-3 mb-3"
+                th:text="${error}"
+              ></div>
+
+              <!-- Items -->
+              <div class="mb-3">
+                <div
+                  class="d-flex align-items-center gap-3 py-3 border-bottom"
+                  th:each="item : ${cartItems}"
+                >
+                  <img
+                    class="item-thumb"
+                    th:src="${item.book.imageUrl}"
+                    th:alt="${item.book.name}"
+                  />
+                  <div class="flex-grow-1">
+                    <div class="item-name" th:text="${item.book.name}">
+                      Tên sản phẩm
+                    </div>
+                    <div class="qty">
+                      Số lượng:
+                      <span th:text="${item.quantity}" style="font-weight: 600"
+                        >0</span
+                      >
+                    </div>
+                  </div>
+                  <div
+                    class="price"
+                    th:text="${#numbers.formatDecimal(item.book.price * item.quantity,0,'COMMA',0,'POINT')} + ' ₫'"
+                  >
+                    0 ₫
+                  </div>
+                </div>
+              </div>
+
+              <!-- Totals -->
+              <div class="total-box">
+                <div class="line">
+                  <span>Tạm tính</span>
+                  <span
+                    class="fw-semibold"
+                    th:text="${#numbers.formatDecimal(totalPrice,0,'COMMA',0,'POINT')} + ' ₫'"
+                    style="color: var(--text-dark)"
+                  >
+                    0 ₫
+                  </span>
+                </div>
+
+                <div class="line total">
+                  <span
+                    ><i class="bi bi-cash-coin me-1"></i>Tổng thanh toán</span
+                  >
+                  <span
+                    th:text="${#numbers.formatDecimal(totalPrice,0,'COMMA',0,'POINT')} + ' ₫'"
+                  >
+                    0 ₫
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+  </body>
+</html>

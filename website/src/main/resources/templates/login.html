@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Đăng nhập – ZUNO Library</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    />
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;800&family=Poppins:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      * {
+        font-family: "Poppins", sans-serif;
+      }
+
+      h1,
+      h2,
+      h3,
+      h4,
+      h5,
+      h6 {
+        font-family: "Playfair Display", serif;
+        font-weight: 700;
+      }
+
+      :root {
+        --primary: #daa520;
+        --primary-dark: #b8860b;
+        --primary-light: #f5deb3;
+        --dark-brown: #8b4513;
+        --warm-bg: #faf8f3;
+        --text-dark: #2c2416;
+        --text-light: #6b5d52;
+        --border-color: rgba(218, 165, 32, 0.2);
+        --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.06);
+        --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.12);
+      }
+
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        background: linear-gradient(
+          135deg,
+          var(--warm-bg) 0%,
+          #ffffff 50%,
+          rgba(218, 165, 32, 0.03) 100%
+        );
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        color: var(--text-dark);
+        padding: 20px;
+        position: relative;
+        overflow: hidden;
+      }
+
+      body::before {
+        content: "";
+        position: absolute;
+        top: -50%;
+        right: -10%;
+        width: 600px;
+        height: 600px;
+        background: radial-gradient(
+          circle,
+          rgba(218, 165, 32, 0.08) 0%,
+          transparent 70%
+        );
+        border-radius: 50%;
+        pointer-events: none;
+      }
+
+      body::after {
+        content: "";
+        position: absolute;
+        bottom: -30%;
+        left: -5%;
+        width: 500px;
+        height: 500px;
+        background: radial-gradient(
+          circle,
+          rgba(139, 69, 19, 0.06) 0%,
+          transparent 70%
+        );
+        border-radius: 50%;
+        pointer-events: none;
+      }
+
+      .login-container {
+        position: relative;
+        z-index: 1;
+        width: 100%;
+        max-width: 500px;
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 0;
+      }
+
+      .login-card {
+        background: #ffffff;
+        border-radius: 24px;
+        box-shadow: var(--shadow-md);
+        overflow: hidden;
+        border: 1px solid var(--border-color);
+      }
+
+      .login-card-header {
+        background: linear-gradient(
+          135deg,
+          var(--primary) 0%,
+          var(--primary-dark) 100%
+        );
+        color: #fff;
+        padding: 40px 30px;
+        text-align: center;
+        position: relative;
+      }
+
+      .login-card-header::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url("data:image/svg+xml,%3Csvg width='100' height='100' xmlns='http://www.w3.org/2000/svg'%3E%3Ctext x='50' y='50' font-size='80' fill='white' opacity='0.05' text-anchor='middle' font-family='serif' dominant-baseline='middle'%3E📖%3C/text%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-size: 200px;
+        background-position: right -20px top -20px;
+        pointer-events: none;
+      }
+
+      .login-card-header h1 {
+        font-size: 32px;
+        font-weight: 800;
+        margin: 0 0 8px 0;
+        position: relative;
+        z-index: 2;
+      }
+
+      .login-card-header p {
+        font-size: 16px;
+        margin: 0;
+        opacity: 0.95;
+        position: relative;
+        z-index: 2;
+        font-weight: 500;
+        letter-spacing: 0.5px;
+      }
+
+      .login-card-body {
+        padding: 40px 35px;
+      }
+
+      .form-section-title {
+        font-size: 14px;
+        font-weight: 700;
+        color: var(--text-light);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 20px;
+        display: none;
+      }
+
+      .form-group {
+        margin-bottom: 18px;
+      }
+
+      .form-label {
+        display: block;
+        font-weight: 600;
+        color: var(--text-dark);
+        margin-bottom: 8px;
+        font-size: 14px;
+      }
+
+      .form-control {
+        width: 100%;
+        padding: 12px 16px;
+        border: 2px solid #e8e3dd;
+        border-radius: 12px;
+        font-size: 15px;
+        background: #ffffff;
+        color: var(--text-dark);
+        transition: all 0.3s ease;
+        font-family: "Poppins", sans-serif;
+      }
+
+      .form-control::placeholder {
+        color: #a89d92;
+      }
+
+      .form-control:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 4px rgba(218, 165, 32, 0.1),
+          inset 0 1px 2px rgba(0, 0, 0, 0.02);
+        background: #fffbf5;
+      }
+
+      .password-group {
+        position: relative;
+      }
+
+      .password-toggle {
+        position: absolute;
+        right: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        color: var(--text-light);
+        cursor: pointer;
+        font-size: 18px;
+        padding: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: color 0.2s;
+        margin-top: 0;
+      }
+
+      .password-toggle:hover {
+        color: var(--primary);
+      }
+
+      .form-actions {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 24px;
+        margin-top: 18px;
+        font-size: 14px;
+      }
+
+      .form-check {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .form-check-input {
+        width: 20px;
+        height: 20px;
+        margin: 0;
+        cursor: pointer;
+        accent-color: var(--primary);
+      }
+
+      .form-check-label {
+        cursor: pointer;
+        color: var(--text-dark);
+        font-weight: 500;
+      }
+
+      .forgot-link {
+        color: var(--primary);
+        text-decoration: none;
+        font-weight: 600;
+        transition: color 0.2s;
+      }
+
+      .forgot-link:hover {
+        color: var(--primary-dark);
+        text-decoration: underline;
+      }
+
+      .btn-login {
+        width: 100%;
+        padding: 14px 20px;
+        font-size: 16px;
+        font-weight: 700;
+        border: none;
+        border-radius: 12px;
+        background: linear-gradient(
+          135deg,
+          var(--primary) 0%,
+          var(--primary-dark) 100%
+        );
+        color: #ffffff;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(218, 165, 32, 0.3);
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+      }
+
+      .btn-login:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(218, 165, 32, 0.4);
+      }
+
+      .btn-login:active {
+        transform: translateY(0);
+      }
+
+      .btn-login:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+      }
+
+      .oauth-divider {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin: 28px 0;
+        color: var(--text-light);
+        font-size: 13px;
+      }
+
+      .oauth-divider::before,
+      .oauth-divider::after {
+        content: "";
+        flex: 1;
+        height: 1px;
+        background: #e8e3dd;
+      }
+
+      .btn-google {
+        width: 100%;
+        padding: 12px 20px;
+        font-size: 15px;
+        font-weight: 600;
+        border: 2px solid #e8e3dd;
+        border-radius: 12px;
+        background: #ffffff;
+        color: var(--text-dark);
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+      }
+
+      .btn-google:hover {
+        border-color: var(--primary);
+        background: #fffbf5;
+        color: var(--primary);
+      }
+
+      .signup-prompt {
+        text-align: center;
+        margin-top: 24px;
+        font-size: 14px;
+        color: var(--text-dark);
+      }
+
+      .signup-prompt a {
+        color: var(--primary);
+        font-weight: 700;
+        text-decoration: none;
+        transition: color 0.2s;
+      }
+
+      .signup-prompt a:hover {
+        color: var(--primary-dark);
+        text-decoration: underline;
+      }
+
+      .alert {
+        padding: 14px 16px;
+        border-radius: 12px;
+        margin-bottom: 20px;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        border-left: 4px solid;
+      }
+
+      .alert-danger {
+        background: #fef3f2;
+        color: #d32f2f;
+        border-color: #d32f2f;
+      }
+
+      .alert-success {
+        background: #f1f8f5;
+        color: #16a34a;
+        border-color: #16a34a;
+      }
+
+      @media (max-width: 600px) {
+        .login-container {
+          max-width: 100%;
+        }
+
+        .login-card-header {
+          padding: 32px 24px;
+        }
+
+        .login-card-header h1 {
+          font-size: 28px;
+        }
+
+        .login-card-body {
+          padding: 32px 24px;
+        }
+
+        .form-actions {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 12px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="login-container">
+      <div class="login-card">
+        <!-- Header -->
+        <div class="login-card-header">
+          <h1>📚 ZUNO Library</h1>
+          <p>Khám phá thế giới sách</p>
+        </div>
+
+        <!-- Body -->
+        <div class="login-card-body">
+          <!-- Alerts -->
+          <div th:if="${param.error}" class="alert alert-danger">
+            <i class="fas fa-exclamation-circle"></i>
+            <span>Sai tên đăng nhập hoặc mật khẩu</span>
+          </div>
+          <div th:if="${param.logout}" class="alert alert-success">
+            <i class="fas fa-check-circle"></i>
+            <span>Đã đăng xuất thành công</span>
+          </div>
+
+          <!-- Login Form -->
+          <form th:action="@{/login}" method="post" id="loginForm" novalidate>
+            <input
+              type="hidden"
+              th:name="${_csrf.parameterName}"
+              th:value="${_csrf.token}"
+            />
+
+            <!-- Username Field -->
+            <div class="form-group">
+              <label for="username" class="form-label">
+                <i
+                  class="fas fa-envelope"
+                  style="color: var(--primary); margin-right: 6px"
+                ></i>
+                Email hoặc Tên đăng nhập
+              </label>
+              <input
+                type="text"
+                id="username"
+                name="username"
+                class="form-control"
+                placeholder="Nhập email hoặc tên đăng nhập"
+                required
+                autofocus
+                autocomplete="username"
+              />
+            </div>
+
+            <!-- Password Field -->
+            <div class="form-group password-group">
+              <label for="password" class="form-label">
+                <i
+                  class="fas fa-lock"
+                  style="color: var(--primary); margin-right: 6px"
+                ></i>
+                Mật khẩu
+              </label>
+              <div style="position: relative">
+                <input
+                  type="password"
+                  id="password"
+                  name="password"
+                  class="form-control"
+                  placeholder="Nhập mật khẩu"
+                  required
+                  autocomplete="current-password"
+                />
+                <button
+                  type="button"
+                  class="password-toggle"
+                  id="togglePassword"
+                  aria-label="Hiện/Ẩn mật khẩu"
+                >
+                  <i class="fa-regular fa-eye" aria-hidden="true"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- Remember & Forgot -->
+            <div class="form-actions">
+              <div class="form-check">
+                <input
+                  type="checkbox"
+                  class="form-check-input"
+                  id="rememberMe"
+                  name="remember-me"
+                />
+                <label class="form-check-label" for="rememberMe"
+                  >Nhớ đăng nhập</label
+                >
+              </div>
+              <a href="#" th:href="@{/forgot-password}" class="forgot-link"
+                >Quên mật khẩu?</a
+              >
+            </div>
+
+            <!-- Login Button -->
+            <button type="submit" class="btn-login" id="submitBtn">
+              <span class="btn-text">Đăng Nhập</span>
+              <span
+                class="spinner-border spinner-border-sm ms-2 d-none"
+                role="status"
+                aria-hidden="true"
+              ></span>
+            </button>
+          </form>
+
+          <!-- OAuth Divider -->
+          <div class="oauth-divider">Hoặc</div>
+
+          <!-- Google Login -->
+          <a href="/oauth2/authorization/google" class="btn-google">
+            <i class="fab fa-google"></i>
+            <span>Đăng nhập với Google</span>
+          </a>
+
+          <!-- Sign Up Link -->
+          <div class="signup-prompt">
+            Chưa có tài khoản? <a th:href="@{/register}">Đăng ký ngay</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+    <script>
+      console.log("=== JAVASCRIPT LOADED ===");
+
+      // Password toggle
+      const toggleBtn = document.getElementById("togglePassword");
+      const pwdInput = document.getElementById("password");
+
+      if (toggleBtn && pwdInput) {
+        toggleBtn.addEventListener("click", function (e) {
+          e.preventDefault();
+          console.log("Toggle password clicked");
+          const icon = toggleBtn.querySelector("i");
+          if (pwdInput.type === "password") {
+            pwdInput.type = "text";
+            icon.classList.remove("fa-eye");
+            icon.classList.add("fa-eye-slash");
+          } else {
+            pwdInput.type = "password";
+            icon.classList.remove("fa-eye-slash");
+            icon.classList.add("fa-eye");
+          }
+        });
+      }
+
+      // Auto-focus password when Enter in username
+      const usernameInput = document.getElementById("username");
+      const passwordInput = document.getElementById("password");
+
+      if (usernameInput && passwordInput) {
+        usernameInput.addEventListener("keypress", function (e) {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            passwordInput.focus();
+            console.log("Enter in username - focused password");
+          }
+        });
+      }
+
+      console.log("=== JAVASCRIPT READY ===");
+    </script>
+  </body>
+</html>

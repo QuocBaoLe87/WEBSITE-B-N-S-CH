@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Xác nhận đơn hàng</title>
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" />
+    <!-- Bootstrap Icons -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
+      rel="stylesheet"
+    />
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;800&family=Poppins:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      :root {
+        --brand-golden: #daa520;
+        --brand-dark: #8b4513;
+        --brand-light: #f5deb3;
+        --ink-800: #1f2328;
+        --ink-600: #495057;
+      }
+
+      * {
+        font-family: "Poppins", sans-serif;
+      }
+
+      h1,
+      h2,
+      h3,
+      h4,
+      h5,
+      h6 {
+        font-family: "Playfair Display", serif;
+      }
+
+      /* Nền gradient ấm áp - bookstore theme */
+      .confirm-page {
+        background: radial-gradient(
+            1200px 800px at -10% -10%,
+            rgba(218, 165, 32, 0.15) 0%,
+            rgba(218, 165, 32, 0) 45%
+          ),
+          radial-gradient(
+            900px 700px at 110% 0%,
+            rgba(139, 69, 19, 0.12) 0%,
+            rgba(139, 69, 19, 0) 40%
+          ),
+          linear-gradient(135deg, #faf8f3 0%, #f5f1e8 65%);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+      }
+
+      /* Thẻ glass với màu ấm */
+      .card-glass {
+        background: rgba(255, 255, 255, 0.96);
+        border: 1.5px solid rgba(218, 165, 32, 0.2);
+        border-radius: 1.25rem;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+        backdrop-filter: blur(10px);
+      }
+
+      .title {
+        color: var(--brand-dark);
+        font-weight: 800;
+        letter-spacing: 0.2px;
+        font-size: 1.75rem;
+      }
+
+      .subtitle {
+        color: var(--ink-600);
+        font-size: 1rem;
+        font-weight: 500;
+      }
+
+      /* Badge trạng thái */
+      .status-badge {
+        font-size: 0.95rem;
+        padding: 0.45rem 0.9rem;
+        font-weight: 600;
+      }
+
+      /* Success icon circle */
+      .success-circle {
+        background: linear-gradient(
+          135deg,
+          rgba(218, 165, 32, 0.1),
+          rgba(245, 222, 179, 0.1)
+        ) !important;
+        border: 2px solid rgba(218, 165, 32, 0.3) !important;
+      }
+
+      .success-icon {
+        color: var(--brand-golden) !important;
+      }
+
+      /* Order details styling */
+      .order-details {
+        border-bottom: 1.5px solid rgba(218, 165, 32, 0.2);
+      }
+
+      .order-details .d-flex {
+        color: var(--ink-800);
+      }
+
+      .order-details .fw-semibold {
+        color: var(--brand-dark);
+      }
+
+      /* Brand button */
+      .btn-primary {
+        background: linear-gradient(135deg, var(--brand-golden), #b8860b);
+        border: none;
+        color: white;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        padding: 0.65rem 1.5rem;
+        font-size: 0.95rem;
+      }
+
+      .btn-primary:hover {
+        background: linear-gradient(135deg, #b8860b, #8b6914);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(218, 165, 32, 0.25);
+        color: white;
+      }
+
+      .btn-primary:focus {
+        box-shadow: 0 0 0 0.25rem rgba(218, 165, 32, 0.15);
+      }
+
+      /* Alert styling */
+      .alert-success {
+        background: rgba(218, 165, 32, 0.08);
+        border: 1.5px solid rgba(218, 165, 32, 0.3);
+        color: var(--brand-dark);
+      }
+
+      .alert-success .btn-close {
+        opacity: 0.7;
+      }
+
+      /* Responsive */
+      @media (max-width: 576px) {
+        .title {
+          font-size: 1.5rem;
+        }
+
+        .subtitle {
+          font-size: 0.95rem;
+        }
+
+        .card-glass {
+          padding: 1.5rem !important;
+        }
+      }
+    </style>
+  </head>
+  <body class="confirm-page">
+    <main class="container py-5">
+      <div class="row justify-content-center">
+        <div class="col-12 col-md-10 col-lg-8 col-xxl-6">
+          <div class="card-glass p-4 p-md-5 text-center">
+            <!-- Success message alert (nếu có) -->
+            <div
+              th:if="${message}"
+              class="alert alert-success alert-dismissible fade show mb-4"
+              role="alert"
+            >
+              <i class="bi bi-check-circle-fill me-2"></i>
+              <span th:text="${message}"></span>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="alert"
+                aria-label="Close"
+              ></button>
+            </div>
+
+            <div class="mb-3">
+              <span
+                class="d-inline-flex align-items-center justify-content-center rounded-circle success-circle"
+                style="width: 80px; height: 80px"
+              >
+                <i
+                  class="bi bi-check2-circle success-icon"
+                  style="font-size: 2.2rem"
+                ></i>
+              </span>
+            </div>
+
+            <h1 class="title mb-2">Cảm ơn bạn đã đặt hàng!</h1>
+            <p class="subtitle mb-4">
+              Đơn hàng của bạn đã được ghi nhận và sẽ được xử lý trong thời gian
+              sớm nhất.
+            </p>
+
+            <div class="text-start mx-auto" style="max-width: 560px">
+              <div
+                class="d-flex justify-content-between align-items-center py-2 order-details"
+              >
+                <span class="fw-semibold">Mã đơn</span>
+                <span th:text="${order.id}">123</span>
+              </div>
+              <div
+                class="d-flex justify-content-between align-items-center py-2"
+              >
+                <span class="fw-semibold">Trạng thái</span>
+                <span
+                  th:class="${ order.status=='PENDING'   ? 'badge status-badge bg-warning text-dark' :
+                             order.status=='CONFIRMED' ? 'badge status-badge' :
+                             order.status=='SHIPPED'   ? 'badge status-badge' :
+                             order.status=='DELIVERED' ? 'badge status-badge' :
+                                                          'badge status-badge bg-secondary' }"
+                  style="background-color: var(--brand-golden); color: white"
+                  th:text="${order.status}"
+                  >PENDING</span
+                >
+              </div>
+            </div>
+
+            <div class="mt-4 d-flex justify-content-center gap-2">
+              <a th:href="@{/}" class="btn btn-primary">
+                <i class="bi bi-house-door-fill me-2"></i>Về trang chủ
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+  </body>
+</html>
